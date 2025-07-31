@@ -8,14 +8,17 @@ def generate_sql(course_tuples):
     for i, (course, pattern) in enumerate(course_tuples):
         course_safe = escape_quotes(course)
         sql = f"""SELECT
-  COALESCE((
-    SELECT id FROM mdl_course
-    WHERE LOWER(fullname) LIKE '{pattern}'
-    LIMIT 1
-  ), 'N/A') AS id{i+1},
-  '{course_safe}'"""
+  CONCAT(
+    COALESCE((
+      SELECT id FROM mdl_course
+      WHERE LOWER(fullname) LIKE '{pattern}'
+      LIMIT 1
+    ), 'N/A'),
+    ',', '{course_safe}'
+  )"""
         sql_parts.append(sql)
     return " UNION ALL\n".join(sql_parts)
+
 
 def format_course_name(name):
     """Extract main keywords from the course title for a fuzzy LIKE match."""
