@@ -8,13 +8,13 @@ def generate_sql(course_tuples):
     for i, (course, pattern) in enumerate(course_tuples):
         course_safe = escape_quotes(course)
         sql = f"""SELECT
-  CONCAT(
+  CONCAT_WS('\t',
     COALESCE((
       SELECT id FROM mdl_course
       WHERE LOWER(fullname) LIKE '{pattern}'
       LIMIT 1
     ), 'N/A'),
-    ',', '{course_safe}'
+    '{course_safe}'
   )"""
         sql_parts.append(sql)
     return " UNION ALL\n".join(sql_parts)
